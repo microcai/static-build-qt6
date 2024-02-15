@@ -39,12 +39,18 @@ jobs:
           # Create archive of the pre-built Qt binaries
           7z a qt6_661_static_64.zip ..\Qt6_binaries
           tar -cf qt6_661_static_64.tar ..\Qt6_binaries
-    - name: Upload
+    - name: Upload tar
       uses: actions/upload-artifact@v4
       with:
         overwrite: true
         name: qt6_661_static_64.tar
         path: qt6_661_static_64.tar
+    - name: Upload zip
+      uses: actions/upload-artifact@v4
+      with:
+        overwrite: true
+        name: qt6_661_static_64
+        path: qt6_661_static_64.zip
     - name: Release
       uses: softprops/action-gh-release@v1
       with:
