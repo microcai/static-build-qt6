@@ -34,13 +34,19 @@ jobs:
         ..\qt5\configure.bat -release -static -static-runtime -no-pch -optimize-size -platform win32-msvc -prefix "..\Qt6_binaries" -no-feature-accessibility -confirm-license -- -DFEATURE_cxx20=ON
         cmake --build . --parallel 4
         cmake --install .
-    - uses: actions/upload-artifact@v4
+    - name: Package binaries
+      run: |
+          # Create archive of the pre-built Qt binaries
+          7z a qt6_661_static_64.zip ..\Qt6_binaries
+          tar -cf qt6_661_static_64.tar ..\Qt6_binaries
+    - name: Upload
+      uses: actions/upload-artifact@v4
       with:
         overwrite: true
-        name: qt6_661_static_64
-        path: Qt6_binaries
+        name: qt6_661_static_64.tar
+        path: qt6_661_static_64.tar
     - name: Release
       uses: softprops/action-gh-release@v1
       with:
-        files: Qt6_binaries
+        files: qt6_661_static_64.tar qt6_661_static_64.zip
   
