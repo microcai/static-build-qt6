@@ -54,5 +54,5 @@ jobs:
     - name: Release
       uses: softprops/action-gh-release@v1
       with:
-        files: qt6_661_static_64.tar qt6_661_static_64.zip
+        files: qt6_661_static_64.zip
   
