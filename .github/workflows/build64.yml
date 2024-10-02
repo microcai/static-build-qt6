@@ -3,7 +3,7 @@ name: build64
 on: workflow_dispatch
 
 jobs:
-  GenerateWinStaticBinaries:
+  Build_QT_MSVC_Static:
     runs-on: windows-2022
 
     steps:
