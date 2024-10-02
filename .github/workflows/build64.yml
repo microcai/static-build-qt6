@@ -22,7 +22,7 @@ jobs:
       run: |
         # Clone Qt6 repo
         cd ..
-        git clone https://code.qt.io/qt/qt5.git -b 6.6.1
+        git clone https://code.qt.io/qt/qt5.git -b 6.7.3
         cd qt5
         perl init-repository -f --module-subset=qt5compat,qt3d,qtbase,qtcharts,qtdeclarative,qtimageformats,qtlanguageserver,qtmqtt,qtmultimedia,qtnetworkauth,qtquick3d,qtquicktimeline,qtserialbus,qtserialport,qtshadertools,qtsvg,qtwebchannel,qtwebengine,qtwebsockets,qtwebview
         # Create shadow build folder
@@ -37,22 +37,22 @@ jobs:
     - name: Package binaries
       run: |
           # Create archive of the pre-built Qt binaries
-          7z a qt6_661_static_64.zip ..\Qt6_binaries
-          tar -cf qt6_661_static_64.tar ..\Qt6_binaries
+          7z a qt6_673_static_64.zip ..\Qt6_binaries
+          tar -cf qt6_673_static_64.tar ..\Qt6_binaries
     - name: Upload tar
       uses: actions/upload-artifact@v4
       with:
         overwrite: true
-        name: qt6_661_static_64.tar
-        path: qt6_661_static_64.tar
+        name: qt6_673_static_64.tar
+        path: qt6_673_static_64.tar
     - name: Upload zip
       uses: actions/upload-artifact@v4
       with:
         overwrite: true
-        name: qt6_661_static_64
-        path: qt6_661_static_64.zip
+        name: qt6_673_static_64
+        path: qt6_673_static_64.zip
     - name: Release
       uses: softprops/action-gh-release@v1
       with:
-        files: qt6_661_static_64.zip
+        files: qt6_673_static_64.zip
   
