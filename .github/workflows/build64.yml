@@ -27,6 +27,7 @@ jobs:
     - name: Compile static Qt version
       run: |
         # Create shadow build folder
+        cd ..
         mkdir qt6_shadow
         cd qt6_shadow
         # Setup the compiler
