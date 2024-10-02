@@ -24,7 +24,7 @@ jobs:
         cd ..
         git clone https://code.qt.io/qt/qt5.git -b 6.7.3
         cd qt5
-        perl init-repository -f --module-subset=all
+        perl init-repository -f --module-subset=qt5compat,qt3d,qtbase,qtcharts,qtdeclarative,qtimageformats,qtlanguageserver,qtmqtt,qtmultimedia,qtnetworkauth,qtquick3d,qtquicktimeline,qtserialbus,qtserialport,qtshadertools,qtsvg,qtwebchannel,qtwebengine,qtwebsockets,qtwebview
         cd ..
     - name: Compile static Qt version
       run: |
