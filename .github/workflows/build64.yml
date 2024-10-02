@@ -16,6 +16,8 @@ jobs:
       uses: TheMrMilchmann/setup-msvc-dev@v3
       with:
         arch: 'amd64'
+    - name: Install ninja-build tool
+      uses: seanmiddleditch/gha-setup-ninja@v5
     - name: Clone Qt repo and its submodules
       run: |
         # Clone Qt6 repo
