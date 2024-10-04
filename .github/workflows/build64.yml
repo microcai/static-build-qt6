@@ -34,7 +34,7 @@ jobs:
         cd qt6_shadow
         # Setup the compiler
         # Configure Qt6
-        ..\qt5\configure.bat -release -static -static-runtime -no-pch -optimize-size -platform win32-msvc -prefix "..\Qt6_binaries" -no-feature-accessibility -confirm-license -- -DFEATURE_cxx20=ON
+        ..\qt5\configure.bat -debug-and-release -static -static-runtime -no-pch -optimize-size -platform win32-msvc -prefix "..\Qt6_binaries" -no-feature-accessibility -confirm-license -- -DFEATURE_cxx20=ON
         cmake --build . --parallel 4
         cmake --install .
     - name: Package binaries
