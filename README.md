@@ -1,2 +1,3 @@
 # static-build-qt6
-static-build-qt6-msvc-2022
+
+a github action script to automatically build static qt library for use with msvc2022
