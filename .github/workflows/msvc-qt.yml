@@ -46,17 +46,17 @@ jobs:
       uses: actions/cache@v4
       with:
         path: ${{ runner.workspace }}/qt-source
-        key: qt-source-6.8.1
+        key: qt-source-6.8.2
 
     - name: Clone Qt repo and its submodules
       working-directory: ${{ runner.workspace }}
       if: steps.cache-qt-repo.outputs.cache-hit != 'true'
       run: |
         # Clone Qt6 repo
-        git clone https://github.com/qt/qt5.git -b v6.8.1 --depth 1 qt-source
+        git clone https://github.com/qt/qt5.git -b v6.8.2 --depth 1 qt-source
         cd qt-source
         git apply ${{ github.workspace }}/0001-shadow-clone-for-submodules.patch
-        perl init-repository.pl --shallow --mirror https://github.com/qt/
+        perl init-repository.pl --shallow
 
     - name: create build directory
       working-directory: ${{ runner.workspace }}
@@ -75,11 +75,10 @@ jobs:
         -no-feature-windeployqt
         -no-feature-macdeployqt
         -no-feature-androiddeployqt
-        -no-feature-designer
         -no-feature-qdbus
         -no-feature-qtdiag
         -no-feature-qtplugininfo
-        -skip qtopcua,qtgrpc,qt3d,qtcanvas3d,qtdatavis3d,qtgamepad,qtcharts,qtconnectivity,qtmqtt,qtcoap,qtqa,qtdbus,qtremoteobjects,qtpim,qtspeech,qtfeedback,qtactiveqt,qtserialbus,qtserialport,tests
+        -skip qtquick3d,qtopcua,qtgrpc,qt3d,qtcanvas3d,qtdatavis3d,qtgamepad,qtcharts,qtconnectivity,qtmqtt,qtcoap,qtqa,qtdbus,qtremoteobjects,qtpim,qtspeech,qtfeedback,qtactiveqt,qtserialbus,qtserialport,tests
         -- -DFEATURE_cxx20=${{ matrix.FEATURE_cxx20 }}
 
     - name: build qt
