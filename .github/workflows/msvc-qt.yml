@@ -4,45 +4,53 @@ on: [push, workflow_dispatch]
 
 jobs:
   matrix_build:
-    runs-on: windows-2022
+    runs-on: windows-latest
     strategy:
       fail-fast: false
       matrix:
-        arch: [win64, win32]
+        arch: [win64]
         buildtype: [debug-and-release, release]
+        qtversion: [6.10.0]
 
     steps:
-    - uses: actions/checkout@v4.2.2
-    - uses: actions/setup-python@v5.6.0
+    - name: setup release or debug build arguments
+      id: cfgvar
+      shell: bash
+      run: |
+        if [[ "${{matrix.buildtype}}" = "debug-and-release" ]] ; then
+          echo "buildarg=-debug-and-release" >> "$GITHUB_OUTPUT"
+          echo zip_file_name=qt${{matrix.qtversion}}_${{ matrix.arch }}-msvc2022_static-${{ matrix.buildtype }}.zip >> "$GITHUB_OUTPUT"
+        else
+          echo "buildarg=-static -static-runtime -release -no-pch -optimize-size" >> "$GITHUB_OUTPUT"
+          echo zip_file_name=qt${{matrix.qtversion}}_${{ matrix.arch }}-msvc2022_static-release.zip >> "$GITHUB_OUTPUT"
+        fi
+        if [[ "${{matrix.arch}}" = "win32" ]] ; then
+          echo "clarch=amd64_x86" >> "$GITHUB_OUTPUT"
+        else
+          echo "clarch=x64" >> "$GITHUB_OUTPUT"
+        fi
+
+    - uses: actions/checkout@v5
+    - uses: actions/setup-python@v6
     - run: python --version
-    - name: Setup the compiler target win64
-      if: startsWith(matrix.arch, 'win64')
-      uses: TheMrMilchmann/setup-msvc-dev@v3
-      with:
-        arch: 'x64'
 
-    - name: Setup the compiler target win32
-      if: startsWith(matrix.arch, 'win32')
-      uses: TheMrMilchmann/setup-msvc-dev@v3
+    - name: Setup the compiler
+      uses: TheMrMilchmann/setup-msvc-dev@v4
       with:
-        arch: 'amd64_x86'
-
-    - name: Install ninja-build tool
-      uses: seanmiddleditch/gha-setup-ninja@v6
+        arch: ${{steps.cfgvar.outputs.clarch}}
 
     - name: Cache huge Qt repo
       id: cache-qt-repo
       uses: actions/cache@v4
       with:
         path: ${{ runner.workspace }}/qt-source
-        key: qt-source-6.9.1
-
+        key: qt-source-${{matrix.qtversion}}
     - name: Clone Qt repo and its submodules
-      working-directory: ${{ runner.workspace }}
       if: steps.cache-qt-repo.outputs.cache-hit != 'true'
+      working-directory: ${{ runner.workspace }}
       run: |
         # Clone Qt6 repo
-        git clone git://code.qt.io/qt/qt5.git -b v6.9.1 --depth 1 qt-source
+        git clone git://code.qt.io/qt/qt5.git -b ${{matrix.qtversion}} --depth 1 qt-source
         cd qt-source
         git apply ${{ github.workspace }}/0001-shadow-clone-for-submodules.patch
         perl init-repository.pl --shallow
@@ -54,7 +62,7 @@ jobs:
     - name: configure Qt for static build
       working-directory: ${{ runner.workspace }}/qt-build
       run: >
-        ..\qt-source\configure.bat -${{ matrix.buildtype }} -static -static-runtime -no-pch -optimize-size -platform win32-msvc
+        ..\qt-source\configure.bat ${{ steps.cfgvar.outputs.buildarg }} -platform win32-msvc
         -prefix "..\qt-release" -confirm-license
         -no-feature-accessibility
         -no-feature-valgrind
@@ -89,18 +97,18 @@ jobs:
     # Create archive of the pre-built Qt binaries
     - name: Package binaries
       working-directory: ${{ runner.workspace }}/qt-release
-      run: 7z a ${{ github.workspace }}\\qt6_691_${{ matrix.arch }}-msvc2022_static-${{ matrix.buildtype }}.zip .
+      run: 7z a ${{ github.workspace }}\\${{ steps.cfgvar.outputs.zip_file_name }} .
 
     - name: Release
-      uses: softprops/action-gh-release@v2.2.2
+      uses: softprops/action-gh-release@v2.4.2
       if: startsWith(github.ref, 'refs/tags/')
       with:
-        files: qt6_691_${{ matrix.arch }}-msvc2022_static-${{ matrix.buildtype }}.zip
+        files: ${{ steps.cfgvar.outputs.zip_file_name }}
 
     - name: Upload artifact
-      uses: actions/upload-artifact@v4.6.2
+      uses: actions/upload-artifact@v5
       with:
         overwrite: true
-        name: qt6_691_${{ matrix.arch }}-msvc2022_static-${{ matrix.buildtype }}
+        name: ${{ steps.cfgvar.outputs.zip_file_name }}
         path: ${{ runner.workspace }}/qt-release
 
