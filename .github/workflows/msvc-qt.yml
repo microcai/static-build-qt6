@@ -19,7 +19,7 @@ jobs:
       run: |
         if [[ "${{matrix.buildtype}}" = "debug-and-release" ]] ; then
           echo "buildarg=-debug-and-release" >> "$GITHUB_OUTPUT"
-          echo zip_file_name=qt${{matrix.qtversion}}_${{ matrix.arch }}-msvc2022_static-${{ matrix.buildtype }}.zip >> "$GITHUB_OUTPUT"
+          echo zip_file_name=qt${{matrix.qtversion}}_${{ matrix.arch }}-msvc2022_dll-${{ matrix.buildtype }}.zip >> "$GITHUB_OUTPUT"
         else
           echo "buildarg=-static -static-runtime -release -no-pch -optimize-size" >> "$GITHUB_OUTPUT"
           echo zip_file_name=qt${{matrix.qtversion}}_${{ matrix.arch }}-msvc2022_static-release.zip >> "$GITHUB_OUTPUT"
