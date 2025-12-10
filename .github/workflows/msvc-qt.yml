@@ -10,7 +10,7 @@ jobs:
       matrix:
         arch: [win64]
         buildtype: [debug-and-release, release]
-        qtversion: [6.10.0]
+        qtversion: [6.10.1]
 
     steps:
     - name: setup release or debug build arguments
