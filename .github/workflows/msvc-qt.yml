@@ -4,13 +4,13 @@ on: [push, workflow_dispatch]
 
 jobs:
   matrix_build:
-    runs-on: windows-latest
+    runs-on: windows-2025
     strategy:
       fail-fast: false
       matrix:
         arch: [win64]
         buildtype: [debug-and-release, release]
-        qtversion: [6.10.1]
+        qtversion: [6.10.2]
 
     steps:
     - name: setup release or debug build arguments
@@ -19,10 +19,10 @@ jobs:
       run: |
         if [[ "${{matrix.buildtype}}" = "debug-and-release" ]] ; then
           echo "buildarg=-debug-and-release" >> "$GITHUB_OUTPUT"
-          echo zip_file_name=qt${{matrix.qtversion}}_${{ matrix.arch }}-msvc2022_dll-${{ matrix.buildtype }}.zip >> "$GITHUB_OUTPUT"
+          echo zip_file_name=qt${{matrix.qtversion}}_${{ matrix.arch }}-msvc2026_dll-${{ matrix.buildtype }}.zip >> "$GITHUB_OUTPUT"
         else
           echo "buildarg=-static -static-runtime -release -no-pch -optimize-size" >> "$GITHUB_OUTPUT"
-          echo zip_file_name=qt${{matrix.qtversion}}_${{ matrix.arch }}-msvc2022_static-release.zip >> "$GITHUB_OUTPUT"
+          echo zip_file_name=qt${{matrix.qtversion}}_${{ matrix.arch }}-msvc2026_static-release.zip >> "$GITHUB_OUTPUT"
         fi
         if [[ "${{matrix.arch}}" = "win32" ]] ; then
           echo "clarch=amd64_x86" >> "$GITHUB_OUTPUT"
@@ -30,9 +30,16 @@ jobs:
           echo "clarch=x64" >> "$GITHUB_OUTPUT"
         fi
 
-    - uses: actions/checkout@v5
+    - uses: actions/checkout@v6
     - uses: actions/setup-python@v6
     - run: python --version
+
+    - name: Install Visual Studio 2026 Build Tools
+      shell: pwsh
+      run: |
+        Write-Host "Installing VS 2026 Build Tools..."
+        choco install visualstudio2026buildtools --package-parameters "--add Microsoft.VisualStudio.Workload.VCTools --add Microsoft.VisualStudio.Component.VC.Tools.x86.x64 --includeRecommended --quiet" -y --ignore-package-exit-codes=3010
+        Write-Host "VS 2026 Build Tools installation completed"
 
     - name: Setup the compiler
       uses: TheMrMilchmann/setup-msvc-dev@v4
@@ -61,22 +68,10 @@ jobs:
 
     - name: configure Qt for static build
       working-directory: ${{ runner.workspace }}/qt-build
-      run: >
-        ..\qt-source\configure.bat ${{ steps.cfgvar.outputs.buildarg }} -platform win32-msvc
-        -prefix "..\qt-release" -confirm-license
-        -no-feature-accessibility
-        -no-feature-valgrind
-        -no-feature-appstore-compliant
-        -no-feature-assistant
-        -no-feature-example-hwr
-        -no-feature-windeployqt
-        -no-feature-macdeployqt
-        -no-feature-androiddeployqt
-        -no-feature-qdbus
-        -no-feature-qtdiag
-        -no-feature-qtplugininfo
-        -skip qtquick3dphysics,qtgraphs,qtquick3d,qtopcua,qtgrpc,qt3d,qtcanvas3d,qtdatavis3d,qtgamepad,qtcharts,qtconnectivity,qtmqtt,qtcoap,qtqa,qtdbus,qtremoteobjects,qtpim,qtspeech,qtfeedback,qtactiveqt,qtserialbus,tests
-        -- -DFEATURE_cxx20=ON
+      shell: cmd
+      run: |
+        call "C:\Program Files (x86)\Microsoft Visual Studio\18\BuildTools\Common7\Tools\VsDevCmd.bat" -arch=amd64
+        ..\qt-source\configure.bat ${{ steps.cfgvar.outputs.buildarg }} -platform win32-msvc         -prefix "..\qt-release" -confirm-license          -no-feature-accessibility         -no-feature-valgrind         -no-feature-appstore-compliant         -no-feature-assistant         -no-feature-example-hwr         -no-feature-windeployqt         -no-feature-macdeployqt         -no-feature-androiddeployqt         -no-feature-qdbus         -no-feature-qtdiag         -no-feature-qtplugininfo         -skip qtquick3dphysics,qtgraphs,qtquick3d,qtopcua,qtgrpc,qt3d,qtcanvas3d,qtdatavis3d,qtgamepad,qtcharts,qtconnectivity,qtmqtt,qtcoap,qtqa,qtdbus,qtremoteobjects,qtpim,qtspeech,qtfeedback,qtactiveqt,qtserialbus,tests  -- -DFEATURE_cxx20=ON
 
     - name: build qt
       working-directory: ${{ runner.workspace }}/qt-build
