@@ -10,6 +10,7 @@ jobs:
       matrix:
         arch: [win64]
         buildtype: [debug-and-release, release]
+        studioversion: [2022, 2026]
         qtversion: [6.10.2]
 
     steps:
@@ -19,10 +20,10 @@ jobs:
       run: |
         if [[ "${{matrix.buildtype}}" = "debug-and-release" ]] ; then
           echo "buildarg=-debug-and-release" >> "$GITHUB_OUTPUT"
-          echo zip_file_name=qt${{matrix.qtversion}}_${{ matrix.arch }}-msvc2026_dll-${{ matrix.buildtype }}.zip >> "$GITHUB_OUTPUT"
+          echo zip_file_name=qt${{matrix.qtversion}}_${{ matrix.arch }}-msvc${{matrix.studioversion}}_dll-${{ matrix.buildtype }}.zip >> "$GITHUB_OUTPUT"
         else
           echo "buildarg=-static -static-runtime -release -no-pch -optimize-size" >> "$GITHUB_OUTPUT"
-          echo zip_file_name=qt${{matrix.qtversion}}_${{ matrix.arch }}-msvc2026_static-release.zip >> "$GITHUB_OUTPUT"
+          echo zip_file_name=qt${{matrix.qtversion}}_${{ matrix.arch }}-msvc${{matrix.studioversion}}_static-release.zip >> "$GITHUB_OUTPUT"
         fi
         if [[ "${{matrix.arch}}" = "win32" ]] ; then
           echo "clarch=amd64_x86" >> "$GITHUB_OUTPUT"
@@ -35,6 +36,7 @@ jobs:
     - run: python --version
 
     - name: Install Visual Studio 2026 Build Tools
+      if: ${{ matrix.studioversion == 2026 }}
       shell: pwsh
       run: |
         Write-Host "Installing VS 2026 Build Tools..."
