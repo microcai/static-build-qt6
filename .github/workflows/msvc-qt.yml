@@ -72,7 +72,7 @@ jobs:
       working-directory: ${{ runner.workspace }}/qt-build
       shell: cmd
       run: |
-        ..\qt-source\configure.bat ${{ steps.cfgvar.outputs.buildarg }} -platform win32-msvc         -prefix "..\qt-release" -confirm-license          -no-feature-accessibility         -no-feature-valgrind         -no-feature-appstore-compliant         -no-feature-assistant         -no-feature-example-hwr         -no-feature-windeployqt         -no-feature-macdeployqt         -no-feature-androiddeployqt         -no-feature-qdbus         -no-feature-qtdiag         -no-feature-qtplugininfo         -skip qtquick3dphysics,qtgraphs,qtquick3d,qtopcua,qtgrpc,qt3d,qtcanvas3d,qtdatavis3d,qtgamepad,qtcharts,qtconnectivity,qtmqtt,qtcoap,qtqa,qtdbus,qtremoteobjects,qtpim,qtspeech,qtfeedback,qtactiveqt,qtserialbus,tests  -- -DFEATURE_cxx20=ON
+        ..\qt-source\configure.bat ${{ steps.cfgvar.outputs.buildarg }} -platform win32-msvc         -prefix "..\qt-release" -confirm-license          -no-feature-accessibility         -no-feature-valgrind         -no-feature-appstore-compliant         -no-feature-assistant         -no-feature-example-hwr         -no-feature-windeployqt         -no-feature-macdeployqt         -no-feature-androiddeployqt         -no-feature-qdbus         -no-feature-qtdiag         -no-feature-qtplugininfo         -skip qtquick3dphysics,qtgraphs,qtquick3d,qtopcua,qtgrpc,qt3d,qtcanvas3d,qtdatavis3d,qtgamepad,qtcharts,qtmqtt,qtcoap,qtqa,qtdbus,qtremoteobjects,qtpim,qtspeech,qtfeedback,qtactiveqt,tests  -- -DFEATURE_cxx20=ON
 
     - name: build qt
       working-directory: ${{ runner.workspace }}/qt-build
