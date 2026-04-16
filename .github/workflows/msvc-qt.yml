@@ -10,7 +10,7 @@ jobs:
         arch: [win64]
         image: [windows-2025-vs2026, windows-2025]
         buildtype: [debug-and-release, release]
-        qtversion: [6.10.2]
+        qtversion: [6.10.3]
 
     runs-on: ${{ matrix.image }}
     steps:
@@ -50,7 +50,7 @@ jobs:
 
     - name: Cache huge Qt repo
       id: cache-qt-repo
-      uses: actions/cache@v4
+      uses: actions/cache@v5
       with:
         path: ${{ runner.workspace }}/qt-source
         key: qt-source-${{matrix.qtversion}}
@@ -96,13 +96,13 @@ jobs:
       run: 7z a ${{ github.workspace }}\\${{ steps.cfgvar.outputs.zip_file_name }} .
 
     - name: Release
-      uses: softprops/action-gh-release@v2.4.2
+      uses: softprops/action-gh-release@v3
       if: startsWith(github.ref, 'refs/tags/')
       with:
         files: ${{ steps.cfgvar.outputs.zip_file_name }}
 
     - name: Upload artifact
-      uses: actions/upload-artifact@v5
+      uses: actions/upload-artifact@v7
       with:
         overwrite: true
         name: ${{ steps.cfgvar.outputs.zip_file_name }}
